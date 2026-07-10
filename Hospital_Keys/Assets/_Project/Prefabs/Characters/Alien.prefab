@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5189660243092858663}
   - component: {fileID: 161756970133419818}
   - component: {fileID: 2007319913705476048}
+  - component: {fileID: 1230426111939843818}
   m_Layer: 0
   m_Name: Alien
   m_TagString: Untagged
@@ -112,3 +113,23 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1230426111939843818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516418823293663520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71b32333403d76748aaac41e296bb5d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AlienAI
+  moveSpeed: 4
+  arrivalDistance: 0.5
+  detectionRadius: 5
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  playerTransform: {fileID: 0}
+  navPoints: []

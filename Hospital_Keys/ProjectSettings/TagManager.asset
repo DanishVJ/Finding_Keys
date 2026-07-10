@@ -11,9 +11,9 @@ TagManager:
   - Interactable
   - Water
   - UI
-  - 
-  - 
-  - 
+  - Player
+  - Hatch
+  - NavPoint
   - 
   - 
   - 
