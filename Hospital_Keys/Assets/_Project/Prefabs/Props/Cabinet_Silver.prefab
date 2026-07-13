@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1330683935004825486, guid: cfa93c48cb26cdb45842f882eda9e14d, type: 3}
       propertyPath: hiddenCard
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1673836676910665390, guid: cfa93c48cb26cdb45842f882eda9e14d, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'

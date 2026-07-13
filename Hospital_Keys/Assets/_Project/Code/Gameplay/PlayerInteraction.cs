@@ -5,8 +5,11 @@ public class PlayerInteraction : MonoBehaviour
 {
     [Header("Detection Settings")]
     [SerializeField] private float interactionDistance = 2f;
-    [SerializeField] private Vector3 boxCastSize = new Vector3(0.5f, 0.5f, 0.5f); // Thicken the detection zone
     [SerializeField] private LayerMask interactableLayer;
+    
+    [Header("Box Cast Configuration")]
+    [Tooltip("The half-extents (half of the total width, height, and depth) of your interaction box.")]
+    [SerializeField] private Vector3 boxHalfExtents = new Vector3(0.5f, 0.5f, 0.2f);
 
     private PlayerControls _controls;
     private PlayerInventory _inventory;
@@ -31,27 +34,66 @@ public class PlayerInteraction : MonoBehaviour
 
     private void OnInteractPressed(InputAction.CallbackContext context)
     {
-        // Start slightly up from the feet so we are dead-center with the meshes
-        Vector3 origin = transform.position + Vector3.up * 0.5f;
         RaycastHit hit;
 
-        // Using BoxCast instead of Raycast so turning angles don't miss narrow colliders
-        if (Physics.BoxCast(origin, boxCastSize, transform.forward, out hit, transform.rotation, interactionDistance, interactableLayer))
+        // Physics.BoxCast sweeps a 3D box forward from the player's position
+        bool hasHit = Physics.BoxCast(
+            transform.position,              // Center of the starting box
+            boxHalfExtents,                  // Half the size of the box in each axis
+            transform.forward,               // Direction to sweep the box
+            out hit,                         // Store hitting data
+            transform.rotation,              // Orientation of the box (matches player)
+            interactionDistance,             // How far forward to project the sweep
+            interactableLayer                // Layer mask restriction
+        );
+
+        if (hasHit)
         {
-            // Check if the object hit (or any of its parents) implements our interface
-            IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
+            // 1. Check ONLY the exact child object we hit ("Colliders")
+            IInteractable interactable = hit.collider.GetComponent<IInteractable>();
+
+            // 2. STRICT SIBLING CHECK: If it's not there, step up to the immediate parent, 
+            // and look ONLY at its direct children (its siblings) without climbing higher.
+            if (interactable == null && hit.transform.parent != null)
+            {
+                foreach (Transform sibling in hit.transform.parent)
+                {
+                    interactable = sibling.GetComponent<IInteractable>();
+                    if (interactable != null) break; // Found the "Code" sibling! Stop looking.
+                }
+            }
+
             if (interactable != null)
             {
                 interactable.Interact(_inventory);
             }
+            else
+            {
+                Debug.LogWarning($"[PlayerInteraction] Hit {hit.collider.gameObject.name}, but no IInteractable script found among its immediate siblings.");
+            }
         }
     }
 
+    // Draws the interactive volume inside the Scene tab so you can visualize the size
     private void OnDrawGizmosSelected()
     {
-        // Visualizes your interaction box volume in the Scene view when selected
-        Gizmos.color = Color.cyan;
-        Vector3 origin = transform.position + Vector3.up * 0.5f;
-        Gizmos.DrawWireCube(origin + transform.forward * interactionDistance, boxCastSize * 2f);
+        Gizmos.color = Color.yellow;
+        Matrix4x4 oldMatrix = Gizmos.matrix;
+        
+        // Align the gizmo rendering space with the player's position and orientation matrix
+        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+
+        // Draw the starting volume bounds
+        Gizmos.DrawWireCube(Vector3.zero, boxHalfExtents * 2f);
+        
+        // Draw the terminal target bounds where the sweep ends
+        Vector3 endCenter = Vector3.forward * interactionDistance;
+        Gizmos.DrawWireCube(endCenter, boxHalfExtents * 2f);
+        
+        // Connect the corners with directional vector lines
+        Gizmos.DrawLine(new Vector3(-boxHalfExtents.x, 0f, boxHalfExtents.z), new Vector3(-boxHalfExtents.x, 0f, boxHalfExtents.z) + endCenter);
+        Gizmos.DrawLine(new Vector3(boxHalfExtents.x, 0f, boxHalfExtents.z), new Vector3(boxHalfExtents.x, 0f, boxHalfExtents.z) + endCenter);
+
+        Gizmos.matrix = oldMatrix;
     }
 }

@@ -6,40 +6,49 @@ public class Door : MonoBehaviour, IInteractable
     [Header("Door Configuration")]
     [SerializeField] private KeycardLevel requiredLevel = KeycardLevel.Blue;
 
-    [Header("Pivot Setup")]
-    [Tooltip("Drag your partner's child pivot GameObject here!")]
-    [SerializeField] private Transform childPivot;
+    [Header("Orientation Adjustment")]
+    [Tooltip("Check this box if the door swings toward the player instead of away!")]
+    [SerializeField] private bool isFlipped = false;
 
     [Header("Movement Settings")]
     [SerializeField] private float swingSpeed = 6f;
     [SerializeField] private float openAngle = 90f;
-    [SerializeField] private float holdOpenTime = 10f;
+    [SerializeField] private float holdOpenTime = 5f; // Hard-coded to 5 seconds
 
     private bool isOpen = false;
     private float targetYRotation = 0f;
     private float currentYRotation = 0f;
     
-    private Quaternion originalRotation;
+    private Transform doorHingeGrandparent;
     private Coroutine closeTimerCoroutine;
 
     private void Start()
     {
-        // Save the baseline starting rotation so we always return to absolute zero
-        originalRotation = transform.rotation;
-
-        if (childPivot == null)
+        // Step 1: Find the parent folder (the old prefab root)
+        Transform parentFolder = transform.parent;
+        
+        if (parentFolder != null)
         {
-            Debug.LogError($"[Door] Child Pivot missing on {gameObject.name}! Drag the child pivot into the Inspector slot.");
+            // Step 2: Find the grandparent folder (your new custom DoorHinge parent)
+            doorHingeGrandparent = parentFolder.parent;
+        }
+
+        if (doorHingeGrandparent == null)
+        {
+            Debug.LogError($"[Door] {gameObject.name} (Grandchild) cannot find its DoorHinge (Grandparent)! " +
+                           "Please check that this prefab instance is correctly nested under your new scene parent.");
         }
     }
 
     private void Update()
     {
-        // Smoothly step the rotation float toward our target angle
+        if (doorHingeGrandparent == null) return;
+
+        // Smoothly interpolate the rotation angle toward our current target
         currentYRotation = Mathf.MoveTowards(currentYRotation, targetYRotation, swingSpeed * 20f * Time.deltaTime);
         
-        // Feed that angle into our custom child pivot rotation matrix math
-        ApplyPivotRotation(currentYRotation);
+        // Directly rotate the beautiful hinge anchor point you set up in the scene
+        doorHingeGrandparent.localRotation = Quaternion.Euler(0f, currentYRotation, 0f);
     }
 
     public string GetInteractionPrompt()
@@ -50,19 +59,15 @@ public class Door : MonoBehaviour, IInteractable
 
     public void Interact(PlayerInventory playerInventory)
     {
-        // If it's already open, don't re-trigger the swing calculation
         if (isOpen) return;
 
-        // Verify keycard credentials
         if (playerInventory.CurrentHighestCard >= requiredLevel)
         {
             Debug.Log($"Access Granted! Opening door requiring {requiredLevel} clearance.");
             
-            // Calculate direction using the player's world position relative to this door
             Vector3 playerPos = playerInventory.transform.position;
             DetermineSwingDirection(playerPos);
 
-            // Start the 10-second automatic countdown
             if (closeTimerCoroutine != null) StopCoroutine(closeTimerCoroutine);
             closeTimerCoroutine = StartCoroutine(AutoCloseCountdown());
         }
@@ -76,41 +81,29 @@ public class Door : MonoBehaviour, IInteractable
     {
         isOpen = true;
 
-        // Get direction vector from door to player
-        Vector3 dirToPlayer = (interactorPosition - transform.position).normalized;
-        
-        // Dot product checks if player is standing in front or behind the door's local forward axis
-        float dot = Vector3.Dot(transform.forward, dirToPlayer);
+        // Use the grandparent hinge's orientation matrix to calculate side-of-approach
+        Vector3 dirToPlayer = (interactorPosition - doorHingeGrandparent.position).normalized;
+        float dot = Vector3.Dot(doorHingeGrandparent.forward, dirToPlayer);
+
+        // If the door's forward alignment is backwards, reverse the mathematical sign
+        if (isFlipped)
+        {
+            dot *= -1f;
+        }
 
         if (dot > 0f)
         {
-            // Player is in front -> Swing it backward away from them
-            targetYRotation = -openAngle;
+            targetYRotation = -openAngle; // Approached from front -> Swing inward/away
         }
         else
         {
-            // Player is behind -> Swing it forward away from them
-            targetYRotation = openAngle;
+            targetYRotation = openAngle;  // Approached from back -> Swing outward/away
         }
-    }
-
-    private void ApplyPivotRotation(float targetAngle)
-    {
-        if (childPivot == null) return;
-
-        // Reset to default baseline frame position before applying rotation matrix offset
-        transform.rotation = originalRotation;
-
-        // Force parent mesh matrix coordinates to swing relative to the child position instead of parent origin
-        transform.RotateAround(childPivot.position, Vector3.up, targetAngle);
     }
 
     private IEnumerator AutoCloseCountdown()
     {
-        // Hold open for designated time frame
         yield return new WaitForSeconds(holdOpenTime);
-
-        // Reset variables to close the door smoothly back to zero degrees
         targetYRotation = 0f;
         isOpen = false;
     }
