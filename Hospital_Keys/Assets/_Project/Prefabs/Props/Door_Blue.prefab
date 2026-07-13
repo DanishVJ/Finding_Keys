@@ -9,6 +9,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 20311874219990853, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
+      propertyPath: childPivot
+      value: 
+      objectReference: {fileID: 1483313965275155333}
+    - target: {fileID: 20311874219990853, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
       propertyPath: requiredLevel
       value: 1
       objectReference: {fileID: 0}
@@ -65,3 +69,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
+--- !u!4 &1483313965275155333 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5747107528631313062, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
+  m_PrefabInstance: {fileID: 6580913441002809635}
+  m_PrefabAsset: {fileID: 0}

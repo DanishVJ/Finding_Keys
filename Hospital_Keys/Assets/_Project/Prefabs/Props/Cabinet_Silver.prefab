@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1330683935004825486, guid: cfa93c48cb26cdb45842f882eda9e14d, type: 3}
       propertyPath: hiddenCard
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1673836676910665390, guid: cfa93c48cb26cdb45842f882eda9e14d, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -59,6 +59,18 @@ PrefabInstance:
     - target: {fileID: 8086092163528398825, guid: cfa93c48cb26cdb45842f882eda9e14d, type: 3}
       propertyPath: m_Name
       value: Cabinet_Silver
+      objectReference: {fileID: 0}
+    - target: {fileID: 8809410902243309478, guid: cfa93c48cb26cdb45842f882eda9e14d, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8849904181819714302, guid: cfa93c48cb26cdb45842f882eda9e14d, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8896499129652569866, guid: cfa93c48cb26cdb45842f882eda9e14d, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -10,6 +10,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 20311874219990853, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
       propertyPath: requiredLevel
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 335747027661411748, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
+      propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1345012270815460913, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
@@ -52,9 +56,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2199056112135140189, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5251542633101286782, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7159446377629004164, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
       propertyPath: m_Name
       value: Door_Silver
+      objectReference: {fileID: 0}
+    - target: {fileID: 7802725039054282946, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8097122814495276854, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
