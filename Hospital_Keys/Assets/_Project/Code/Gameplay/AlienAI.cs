@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class AlienAI : MonoBehaviour
 {
-    public enum AIState { WaitingAtNavPoint, FleeingToTarget, TransitioningAtHatch }
+    public enum AIState { WaitingAtNavPoint, FleeingToTarget, TransitioningAtHatch, Cornered }
     
     [Header("Current Status")]
     [SerializeField] private AIState currentState = AIState.WaitingAtNavPoint;
@@ -15,6 +15,10 @@ public class AlienAI : MonoBehaviour
     [SerializeField] private LayerMask playerLayer;
     [SerializeField] private LayerMask hatchLayer;
     [SerializeField] private LayerMask navPointLayer;
+    
+    [Header("Obstacle Layers")]
+    [Tooltip("Select your Wall and Interactable (Box) layers here!")]
+    [SerializeField] private LayerMask obstacleLayers; 
 
     [Header("Tweakable Radii")]
     [SerializeField] private float playerDetectRadius = 5f;
@@ -22,6 +26,9 @@ public class AlienAI : MonoBehaviour
 
     private Transform currentTarget;
     private Collider[] playerBuffer = new Collider[1];
+    
+    // Tracks if the alien is breaking free from a previous trap state
+    private bool wasOnceCornered = false;
 
     private void Update()
     {
@@ -42,6 +49,14 @@ public class AlienAI : MonoBehaviour
             case AIState.TransitioningAtHatch:
                 FindAndFleeToNearestNavPoint();
                 break;
+
+            case AIState.Cornered:
+                int playerApproaching = Physics.OverlapSphereNonAlloc(transform.position, playerDetectRadius, playerBuffer, playerLayer);
+                if (playerApproaching > 0)
+                {
+                    FindAndFleeToNearestHatch();
+                }
+                break;
         }
     }
 
@@ -50,9 +65,7 @@ public class AlienAI : MonoBehaviour
         Collider[] hits = Physics.OverlapSphere(transform.position, searchRadius, hatchLayer);
         
         Transform closestHatch = null;
-        Transform absoluteClosestHatchFallback = null; 
         float closestDistance = float.MaxValue;
-        float fallbackDistance = float.MaxValue;
 
         Vector3 playerPos = GetPlayerPosition();
         Vector3 pushDirection = (transform.position - playerPos).normalized;
@@ -60,34 +73,20 @@ public class AlienAI : MonoBehaviour
         foreach (var hit in hits)
         {
             if (!hit.gameObject.activeSelf) continue;
+            if (IsPathBlocked(hit.transform.position)) continue;
 
             float dist = Vector3.Distance(transform.position, hit.transform.position);
-
-            // Track the absolute closest hatch as a fallback option
-            if (dist < fallbackDistance)
-            {
-                fallbackDistance = dist;
-                absoluteClosestHatchFallback = hit.transform;
-            }
 
             Vector3 dirToTarget = (hit.transform.position - transform.position).normalized;
             float dot = Vector3.Dot(pushDirection, dirToTarget);
 
-            // --- 270 DEGREE ARC FILTER ---
-            if (dot < -0.707f) continue; 
+            if (dot < 0.0f) continue; 
 
             if (dist < closestDistance)
             {
                 closestDistance = dist;
                 closestHatch = hit.transform;
             }
-        }
-
-        // REMOVED LINECAST CHECK: Relying on OverlapSphere and safety arc check
-        if (closestHatch == null && absoluteClosestHatchFallback != null)
-        {
-            Debug.Log("[AlienAI] Panic Mode: No path in safety arc. Fleeing to absolute closest hatch.");
-            closestHatch = absoluteClosestHatchFallback;
         }
 
         if (closestHatch != null)
@@ -97,7 +96,10 @@ public class AlienAI : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("CHECKMATE: Alien completely trapped! No hatches available anywhere in the search bubble.");
+            if (currentState != AIState.Cornered)
+            {
+                TriggerCorneredState();
+            }
         }
     }
 
@@ -106,42 +108,27 @@ public class AlienAI : MonoBehaviour
         Collider[] hits = Physics.OverlapSphere(transform.position, searchRadius, navPointLayer);
 
         Transform closestNavPoint = null;
-        Transform absoluteClosestNavFallback = null; 
         float closestDistance = float.MaxValue;
-        float fallbackDistance = float.MaxValue;
 
         Vector3 playerPos = GetPlayerPosition();
         Vector3 pushDirection = (transform.position - playerPos).normalized;
 
         foreach (var hit in hits)
         {
-            float dist = Vector3.Distance(transform.position, hit.transform.position);
+            if (IsPathBlocked(hit.transform.position)) continue;
 
-            // Track absolute closest navpoint as a fallback option
-            if (dist < fallbackDistance)
-            {
-                fallbackDistance = dist;
-                absoluteClosestNavFallback = hit.transform;
-            }
+            float dist = Vector3.Distance(transform.position, hit.transform.position);
 
             Vector3 dirToTarget = (hit.transform.position - transform.position).normalized;
             float dot = Vector3.Dot(pushDirection, dirToTarget);
 
-            // --- 270 DEGREE ARC FILTER ---
-            if (dot < -0.707f) continue; 
+            if (dot < 0.0f) continue; 
 
             if (dist < closestDistance)
             {
                 closestDistance = dist;
                 closestNavPoint = hit.transform;
             }
-        }
-
-        // REMOVED LINECAST CHECK: Relying on OverlapSphere and safety arc check
-        if (closestNavPoint == null && absoluteClosestNavFallback != null)
-        {
-            Debug.Log("[AlienAI] Panic Mode: No navpoint in safety arc. Heading to absolute closest navpoint.");
-            closestNavPoint = absoluteClosestNavFallback;
         }
 
         if (closestNavPoint != null)
@@ -151,7 +138,26 @@ public class AlienAI : MonoBehaviour
         }
         else
         {
-            currentState = AIState.WaitingAtNavPoint;
+            TriggerCorneredState();
+        }
+    }
+
+    private bool IsPathBlocked(Vector3 targetPosition)
+    {
+        Vector3 startPos = transform.position + Vector3.up * 0.1f; 
+        Vector3 endPos = targetPosition + Vector3.up * 0.1f; 
+        return Physics.Linecast(startPos, endPos, obstacleLayers);
+    }
+
+    private void TriggerCorneredState()
+    {
+        currentState = AIState.Cornered;
+        wasOnceCornered = true; // Flips our escape checker toggle
+        Debug.Log("VICTORY: The alien has been successfully cornered!");
+        
+        if (GameUIManager.Instance != null)
+        {
+            GameUIManager.Instance.DisplayNotification("You trapped the alien!");
         }
     }
 
@@ -167,6 +173,20 @@ public class AlienAI : MonoBehaviour
 
     private void MoveTowardsTarget()
     {
+        // Custom notification handling based on whether it broke free or is just walking normal
+        if (GameUIManager.Instance != null)
+        {
+            if (wasOnceCornered)
+            {
+                GameUIManager.Instance.DisplayNotification("Alien escaped again!");
+                wasOnceCornered = false; // Reset toggle so it can be cleared or retrapped cleanly
+            }
+            else
+            {
+                GameUIManager.Instance.DisplayNotification(""); 
+            }
+        }
+
         transform.position = Vector3.MoveTowards(transform.position, currentTarget.position, moveSpeed * Time.deltaTime);
 
         Vector3 dir = (currentTarget.position - transform.position).normalized;
