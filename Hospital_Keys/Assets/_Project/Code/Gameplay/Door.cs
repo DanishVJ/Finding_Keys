@@ -65,6 +65,12 @@ public class Door : MonoBehaviour, IInteractable
         {
             Debug.Log($"Access Granted! Opening door requiring {requiredLevel} clearance.");
             
+            // UI Hook: Inform the player access was approved
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.DisplayNotification($"Access Granted. Opening {requiredLevel} Door.");
+            }
+
             Vector3 playerPos = playerInventory.transform.position;
             DetermineSwingDirection(playerPos);
 
@@ -74,6 +80,12 @@ public class Door : MonoBehaviour, IInteractable
         else
         {
             Debug.Log($"Access Denied! You have {playerInventory.CurrentHighestCard} but need {requiredLevel}.");
+
+            // UI Hook: Clear, visual layout restriction feedback
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.DisplayNotification($"Access Denied! Requires {requiredLevel} keycard or higher.");
+            }
         }
     }
 
@@ -106,5 +118,11 @@ public class Door : MonoBehaviour, IInteractable
         yield return new WaitForSeconds(holdOpenTime);
         targetYRotation = 0f;
         isOpen = false;
+        
+        // Optional UI Hook: Let them know it shut
+        if (GameUIManager.Instance != null)
+        {
+            GameUIManager.Instance.DisplayNotification("Door automatically closed.");
+        }
     }
 }

@@ -13,6 +13,7 @@ public class PlayerInteraction : MonoBehaviour
 
     private PlayerControls _controls;
     private PlayerInventory _inventory;
+    private IInteractable _currentInteractable; // Tracks what we are looking at
 
     private void Awake()
     {
@@ -32,71 +33,101 @@ public class PlayerInteraction : MonoBehaviour
         _controls.Player.Interaction.performed -= OnInteractPressed;
     }
 
-    private void OnInteractPressed(InputAction.CallbackContext context)
+    private void Update()
+    {
+        CheckForInteractable();
+    }
+
+    private void CheckForInteractable()
     {
         RaycastHit hit;
 
-        // Physics.BoxCast sweeps a 3D box forward from the player's position
+        // Continuously sweep the box to check what the player is looking at
         bool hasHit = Physics.BoxCast(
-            transform.position,              // Center of the starting box
-            boxHalfExtents,                  // Half the size of the box in each axis
-            transform.forward,               // Direction to sweep the box
-            out hit,                         // Store hitting data
-            transform.rotation,              // Orientation of the box (matches player)
-            interactionDistance,             // How far forward to project the sweep
-            interactableLayer                // Layer mask restriction
+            transform.position,
+            boxHalfExtents,
+            transform.forward,
+            out hit,
+            transform.rotation,
+            interactionDistance,
+            interactableLayer
         );
 
         if (hasHit)
         {
-            // 1. Check ONLY the exact child object we hit ("Colliders")
             IInteractable interactable = hit.collider.GetComponent<IInteractable>();
 
-            // 2. PARENT & SIBLING CHECK: If it's not on the collider, step up to the parent.
             if (interactable == null && hit.transform.parent != null)
             {
-                // First, check if the parent itself has the script
                 interactable = hit.transform.parent.GetComponent<IInteractable>();
 
-                // If the parent doesn't have it, look through the direct children (siblings)
                 if (interactable == null)
                 {
                     foreach (Transform sibling in hit.transform.parent)
                     {
                         interactable = sibling.GetComponent<IInteractable>();
-                        if (interactable != null) break; // Found it! Stop looking.
+                        if (interactable != null) break;
                     }
                 }
             }
 
+            // If we found something interactable, update the UI prompt
             if (interactable != null)
             {
-                interactable.Interact(_inventory);
+                _currentInteractable = interactable;
+                
+                // Safe check for when we build the UI manager next
+                if (GameUIManager.Instance != null)
+                {
+                    GameUIManager.Instance.ShowPrompt(_currentInteractable.GetInteractionPrompt());
+                }
             }
             else
             {
-                Debug.LogWarning($"[PlayerInteraction] Hit {hit.collider.gameObject.name}, but no IInteractable script found on the collider, its parent, or its immediate siblings.");
+                ClearCurrentInteractable();
+            }
+        }
+        else
+        {
+            ClearCurrentInteractable();
+        }
+    }
+
+    private void ClearCurrentInteractable()
+    {
+        _currentInteractable = null;
+        if (GameUIManager.Instance != null)
+        {
+            GameUIManager.Instance.HidePrompt();
+        }
+    }
+
+    private void OnInteractPressed(InputAction.CallbackContext context)
+    {
+        // If our Update loop has already found a valid target, interact immediately!
+        if (_currentInteractable != null)
+        {
+            _currentInteractable.Interact(_inventory);
+            
+            // Refresh the prompt text immediately (e.g., changes to "Empty")
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.ShowPrompt(_currentInteractable.GetInteractionPrompt());
             }
         }
     }
 
-    // Draws the interactive volume inside the Scene tab so you can visualize the size
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Matrix4x4 oldMatrix = Gizmos.matrix;
         
-        // Align the gizmo rendering space with the player's position and orientation matrix
         Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
 
-        // Draw the starting volume bounds
         Gizmos.DrawWireCube(Vector3.zero, boxHalfExtents * 2f);
-        
-        // Draw the terminal target bounds where the sweep ends
         Vector3 endCenter = Vector3.forward * interactionDistance;
         Gizmos.DrawWireCube(endCenter, boxHalfExtents * 2f);
         
-        // Connect the corners with directional vector lines
         Gizmos.DrawLine(new Vector3(-boxHalfExtents.x, 0f, boxHalfExtents.z), new Vector3(-boxHalfExtents.x, 0f, boxHalfExtents.z) + endCenter);
         Gizmos.DrawLine(new Vector3(boxHalfExtents.x, 0f, boxHalfExtents.z), new Vector3(boxHalfExtents.x, 0f, boxHalfExtents.z) + endCenter);
 

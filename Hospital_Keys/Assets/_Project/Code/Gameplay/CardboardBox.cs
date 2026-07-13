@@ -74,5 +74,18 @@ public class CardboardBox : MonoBehaviour, IInteractable
         isMoving = false;
         
         Debug.Log($"[CardboardBox] {gameObject.name} arrived. Is at hatch target: {isAtTarget}");
+
+        // UI Hooks: Alert the player to the state of the hatch layout
+        if (GameUIManager.Instance != null)
+        {
+            if (isAtTarget)
+            {
+                GameUIManager.Instance.DisplayNotification("Box moved over the hatch.");
+            }
+            else
+            {
+                GameUIManager.Instance.DisplayNotification("Hatch is exposed!");
+            }
+        }
     }
 }

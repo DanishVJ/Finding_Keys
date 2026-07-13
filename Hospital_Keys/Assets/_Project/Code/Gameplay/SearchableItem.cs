@@ -19,6 +19,12 @@ public class SearchableItem : MonoBehaviour, IInteractable
         if (hasBeenSearched)
         {
             Debug.Log($"{containerName} has already been searched.");
+            
+            // UI Hook: Inform the player it's already cleared
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.DisplayNotification($"{containerName} is already empty.");
+            }
             return;
         }
 
@@ -27,13 +33,19 @@ public class SearchableItem : MonoBehaviour, IInteractable
 
         if (hiddenCard != KeycardLevel.None)
         {
-            // Safely upgrade the player's keycard rank in their inventory
+            // Safely upgrade the player's keycard rank in their inventory (fires UI alert automatically)
             playerInventory.UpgradeKeycard(hiddenCard);
             Debug.Log($"Success! Found a {hiddenCard} access card.");
         }
         else
         {
             Debug.Log("Nothing found inside.");
+
+            // UI Hook: Display empty container feedback text log
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.DisplayNotification($"Found nothing inside the {containerName}.");
+            }
         }
     }
 }

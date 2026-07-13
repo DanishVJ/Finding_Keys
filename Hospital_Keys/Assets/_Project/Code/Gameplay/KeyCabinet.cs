@@ -12,10 +12,20 @@ public class KeyCabinet : MonoBehaviour, IInteractable
 
     public void Interact(PlayerInventory playerInventory)
     {
-        if (hasBeenOpened) return;
+        if (hasBeenOpened)
+        {
+            // UI Hook: Remind the player that they've already looted this cabinet
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.DisplayNotification("The cabinet is empty.");
+            }
+            return;
+        }
 
         hasBeenOpened = true;
-        playerInventory.AddSimpleKey();
+        
+        // This automatically handles the UI icon update and "Collected a Simple Key!" notification
+        playerInventory.AddSimpleKey(); 
         Debug.Log("[Cabinet] Dispensed 1 Simple Key to the player.");
     }
 }

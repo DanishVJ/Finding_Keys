@@ -20,11 +20,11 @@ public class LockedDesk : MonoBehaviour, IInteractable
         // Check for the consumable key
         if (playerInventory.HasSimpleKey())
         {
-            // 1. Spend the key
+            // 1. Spend the key (fires a UI alert automatically)
             playerInventory.ConsumeSimpleKey();
             isUnlocked = true;
             
-            // 2. Award the gold card!
+            // 2. Award the gold card! (fires a UI upgrade alert automatically)
             playerInventory.UpgradeKeycard(cardToGive);
             Debug.Log($"[Desk] Drawer unlocked! Awarded {cardToGive} Card.");
             
@@ -33,6 +33,12 @@ public class LockedDesk : MonoBehaviour, IInteractable
         else
         {
             Debug.Log("[Desk] The drawer is locked tight. Needs a Simple Key.");
+
+            // UI Hook: Display access restriction alert on screen
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.DisplayNotification("The drawer is locked tight! Needs a Simple Key.");
+            }
         }
     }
 }

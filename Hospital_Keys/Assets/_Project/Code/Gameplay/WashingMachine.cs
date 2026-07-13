@@ -30,6 +30,12 @@ public class WashingMachine : MonoBehaviour, IInteractable
         else
         {
             Debug.Log("[WashingMachine] Looked inside... Empty.");
+            
+            // UI Hook: Display empty alert text on the screen for the player
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.DisplayNotification("Washing machine is empty...");
+            }
         }
     }
 }

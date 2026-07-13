@@ -55,12 +55,24 @@ public class JanitorDoor : MonoBehaviour, IInteractable
             playerInventory.ConsumeSimpleKey();
             Debug.Log("[JanitorDoor] Key accepted. Opening janitor room permanently.");
             
+            // UI Hook: Display unlock success text on screen
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.DisplayNotification("Janitor room unlocked permanently!");
+            }
+            
             Vector3 playerPos = playerInventory.transform.position;
             DetermineSwingDirection(playerPos);
         }
         else
         {
             Debug.Log("[JanitorDoor] Access Denied! You do not have a Simple Key.");
+            
+            // UI Hook: Display lock restriction feedback alert on screen
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.DisplayNotification("Locked! Requires a Simple Key.");
+            }
         }
     }
 
