@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 20311874219990853, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
+      propertyPath: childPivot
+      value: 
+      objectReference: {fileID: 8688251262589396186}
     - target: {fileID: 1345012270815460913, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -61,3 +65,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
+--- !u!4 &8688251262589396186 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5747107528631313062, guid: 91d3fa5390a839543b6febaeea25cf20, type: 3}
+  m_PrefabInstance: {fileID: 3986545096331888252}
+  m_PrefabAsset: {fileID: 0}

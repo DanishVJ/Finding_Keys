@@ -27,7 +27,7 @@ public class SearchableItem : MonoBehaviour, IInteractable
 
         if (hiddenCard != KeycardLevel.None)
         {
-            // Give the card to the player
+            // Safely upgrade the player's keycard rank in their inventory
             playerInventory.UpgradeKeycard(hiddenCard);
             Debug.Log($"Success! Found a {hiddenCard} access card.");
         }
@@ -35,8 +35,5 @@ public class SearchableItem : MonoBehaviour, IInteractable
         {
             Debug.Log("Nothing found inside.");
         }
-
-        // Visual feedback placeholder: turn grey when empty so your partner knows it works
-        GetComponent<Renderer>().material.color = Color.gray;
     }
 }

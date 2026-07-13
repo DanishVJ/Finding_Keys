@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5747107528631313062}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Pivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6034832516787587238}
   - component: {fileID: 20311874219990853}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Code
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -76,6 +76,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Door
   requiredLevel: 0
+  childPivot: {fileID: 5747107528631313062}
+  swingSpeed: 6
+  openAngle: 90
+  holdOpenTime: 10
 --- !u!1 &5251542633101286782
 GameObject:
   m_ObjectHideFlags: 0
@@ -86,7 +90,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3588269006660754667}
   - component: {fileID: 3278413731681583767}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Colliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -175,7 +179,7 @@ GameObject:
   - component: {fileID: 6459602419971818155}
   - component: {fileID: 1911344673201057848}
   - component: {fileID: 8097122814495276854}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 2312614730617949195}
   - component: {fileID: 3486984149623117686}
   - component: {fileID: 1673836676910665390}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -134,7 +134,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4867809356175861065}
   - component: {fileID: 7415842570117765119}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Colliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -187,7 +187,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8742231236920571030}
   - component: {fileID: 1330683935004825486}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Code
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -56,6 +56,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cabinet_Purple
       objectReference: {fileID: 0}
+    - target: {fileID: 8809410902243309478, guid: cfa93c48cb26cdb45842f882eda9e14d, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8849904181819714302, guid: cfa93c48cb26cdb45842f882eda9e14d, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8896499129652569866, guid: cfa93c48cb26cdb45842f882eda9e14d, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
