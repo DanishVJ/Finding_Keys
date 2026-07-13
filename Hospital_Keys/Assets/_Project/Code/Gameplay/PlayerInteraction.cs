@@ -52,14 +52,20 @@ public class PlayerInteraction : MonoBehaviour
             // 1. Check ONLY the exact child object we hit ("Colliders")
             IInteractable interactable = hit.collider.GetComponent<IInteractable>();
 
-            // 2. STRICT SIBLING CHECK: If it's not there, step up to the immediate parent, 
-            // and look ONLY at its direct children (its siblings) without climbing higher.
+            // 2. PARENT & SIBLING CHECK: If it's not on the collider, step up to the parent.
             if (interactable == null && hit.transform.parent != null)
             {
-                foreach (Transform sibling in hit.transform.parent)
+                // First, check if the parent itself has the script
+                interactable = hit.transform.parent.GetComponent<IInteractable>();
+
+                // If the parent doesn't have it, look through the direct children (siblings)
+                if (interactable == null)
                 {
-                    interactable = sibling.GetComponent<IInteractable>();
-                    if (interactable != null) break; // Found the "Code" sibling! Stop looking.
+                    foreach (Transform sibling in hit.transform.parent)
+                    {
+                        interactable = sibling.GetComponent<IInteractable>();
+                        if (interactable != null) break; // Found it! Stop looking.
+                    }
                 }
             }
 
@@ -69,7 +75,7 @@ public class PlayerInteraction : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"[PlayerInteraction] Hit {hit.collider.gameObject.name}, but no IInteractable script found among its immediate siblings.");
+                Debug.LogWarning($"[PlayerInteraction] Hit {hit.collider.gameObject.name}, but no IInteractable script found on the collider, its parent, or its immediate siblings.");
             }
         }
     }
