@@ -22,13 +22,18 @@ public class GameUIManager : MonoBehaviour
 
     private void Awake()
     {
-        // Simple singleton pattern so any script can easily find the UI Manager
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
-        // Hide prompt and key icon at startup
         HidePrompt();
         UpdateSimpleKeyUI(false);
+    }
+
+    // --- NEW: Display the initial welcome message / objective on game startup ---
+    private void Start()
+    {
+        // Change the text inside the quotes below to say whatever you want your player to see first!
+        DisplayNotification("Finding Keys: Trap the alien in the last room!");
     }
 
     // --- 1. INTERACTION PROMPT FUNCTIONS ---
@@ -46,7 +51,6 @@ public class GameUIManager : MonoBehaviour
     // --- 2. INVENTORY DISPLAY FUNCTIONS ---
     public void UpdateSimpleKeyUI(bool hasKey)
     {
-        // If the player doesn't have it, make it semi-transparent gray. If they do, make it solid white.
         simpleKeyIcon.color = hasKey ? Color.white : new Color(0.3f, 0.3f, 0.3f, 0.5f);
     }
 
@@ -60,7 +64,7 @@ public class GameUIManager : MonoBehaviour
         else
         {
             keycardIcon.color = Color.white;
-            keycardIcon.sprite = cardSprite; // Your partner can swap these sprites later!
+            keycardIcon.sprite = cardSprite; 
         }
     }
 

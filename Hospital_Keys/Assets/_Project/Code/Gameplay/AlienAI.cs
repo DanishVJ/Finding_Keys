@@ -24,15 +24,12 @@ public class AlienAI : MonoBehaviour
     [SerializeField] private float playerDetectRadius = 5f;
     [SerializeField] private float searchRadius = 40f;
 
-    // --- NEW: Sound Effects Fields ---
     [Header("Audio Clips")]
     [Tooltip("Sound played the split second the alien spots the player and flees")]
     [SerializeField] private AudioClip detectionSound;
 
     private Transform currentTarget;
     private Collider[] playerBuffer = new Collider[1];
-    
-    // Tracks if the alien is breaking free from a previous trap state
     private bool wasOnceCornered = false;
 
     private void Update()
@@ -43,7 +40,6 @@ public class AlienAI : MonoBehaviour
                 int playerFound = Physics.OverlapSphereNonAlloc(transform.position, playerDetectRadius, playerBuffer, playerLayer);
                 if (playerFound > 0)
                 {
-                    // --- NEW: Play the clip right at the split second of detection ---
                     PlaySound(detectionSound);
                     FindAndFleeToNearestHatch();
                 }
@@ -58,10 +54,17 @@ public class AlienAI : MonoBehaviour
                 break;
 
             case AIState.Cornered:
+                // --- FAIL-SAFE: If a player pulls a box away while cornered, break free instantly ---
+                if (CardboardBox.BlockedHatchCount < 2)
+                {
+                    currentState = AIState.WaitingAtNavPoint;
+                    FindAndFleeToNearestHatch();
+                    break;
+                }
+
                 int playerApproaching = Physics.OverlapSphereNonAlloc(transform.position, playerDetectRadius, playerBuffer, playerLayer);
                 if (playerApproaching > 0)
                 {
-                    // --- NEW: Play detection sound here too if it spot you while cornered ---
                     PlaySound(detectionSound);
                     FindAndFleeToNearestHatch();
                 }
@@ -69,7 +72,6 @@ public class AlienAI : MonoBehaviour
         }
     }
 
-    // --- NEW: Global sound helper function ---
     private void PlaySound(AudioClip clip)
     {
         if (clip != null)
@@ -80,8 +82,14 @@ public class AlienAI : MonoBehaviour
 
     private void FindAndFleeToNearestHatch()
     {
+        // --- FAIL-SAFE CHEAT: Only allowed to be cornered if BOTH boxes block the hatches ---
+        if (CardboardBox.BlockedHatchCount >= 2)
+        {
+            TriggerCorneredState();
+            return;
+        }
+
         Collider[] hits = Physics.OverlapSphere(transform.position, searchRadius, hatchLayer);
-        
         Transform closestHatch = null;
         float closestDistance = float.MaxValue;
 
@@ -94,11 +102,11 @@ public class AlienAI : MonoBehaviour
             if (IsPathBlocked(hit.transform.position)) continue;
 
             float dist = Vector3.Distance(transform.position, hit.transform.position);
-
             Vector3 dirToTarget = (hit.transform.position - transform.position).normalized;
             float dot = Vector3.Dot(pushDirection, dirToTarget);
 
-            if (dot < 0.0f) continue; 
+            // Bypasses dot check constraints if it helps the alien find ANY open path to safety
+            if (dot < 0.0f && hits.Length > 1) continue; 
 
             if (dist < closestDistance)
             {
@@ -114,17 +122,26 @@ public class AlienAI : MonoBehaviour
         }
         else
         {
-            if (currentState != AIState.Cornered)
+            // Back-up search fallback: look for ANY active hatch regardless of player angle
+            foreach (var hit in hits)
             {
-                TriggerCorneredState();
+                if (!hit.gameObject.activeSelf) continue;
+                currentTarget = hit.transform;
+                currentState = AIState.FleeingToTarget;
+                return;
             }
         }
     }
 
     private void FindAndFleeToNearestNavPoint()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, searchRadius, navPointLayer);
+        if (CardboardBox.BlockedHatchCount >= 2)
+        {
+            TriggerCorneredState();
+            return;
+        }
 
+        Collider[] hits = Physics.OverlapSphere(transform.position, searchRadius, navPointLayer);
         Transform closestNavPoint = null;
         float closestDistance = float.MaxValue;
 
@@ -136,7 +153,6 @@ public class AlienAI : MonoBehaviour
             if (IsPathBlocked(hit.transform.position)) continue;
 
             float dist = Vector3.Distance(transform.position, hit.transform.position);
-
             Vector3 dirToTarget = (hit.transform.position - transform.position).normalized;
             float dot = Vector3.Dot(pushDirection, dirToTarget);
 
@@ -156,7 +172,8 @@ public class AlienAI : MonoBehaviour
         }
         else
         {
-            TriggerCorneredState();
+            // Fallback route: clear state blockages and flee blindly 
+            currentState = AIState.WaitingAtNavPoint;
         }
     }
 
@@ -170,8 +187,8 @@ public class AlienAI : MonoBehaviour
     private void TriggerCorneredState()
     {
         currentState = AIState.Cornered;
-        wasOnceCornered = true; // Flips our escape checker toggle
-        Debug.Log("VICTORY: The alien has been successfully cornered!");
+        wasOnceCornered = true; 
+        Debug.Log("VICTORY: Both hatches sealed! The alien has been successfully cornered!");
         
         if (GameUIManager.Instance != null)
         {
@@ -196,11 +213,7 @@ public class AlienAI : MonoBehaviour
             if (wasOnceCornered)
             {
                 GameUIManager.Instance.DisplayNotification("Alien escaped again!");
-                wasOnceCornered = false; // Reset toggle so it can be cleared or retrapped cleanly
-            }
-            else
-            {
-                GameUIManager.Instance.DisplayNotification(""); 
+                wasOnceCornered = false; 
             }
         }
 
