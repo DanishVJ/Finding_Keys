@@ -11,6 +11,11 @@ public class JanitorDoor : MonoBehaviour, IInteractable
     [SerializeField] private float swingSpeed = 6f;
     [SerializeField] private float openAngle = 90f;
 
+    // --- NEW: Sound Effect Field ---
+    [Header("Audio Clips")]
+    [Tooltip("Sound played when the simple key is successfully used to unlock the door")]
+    [SerializeField] private AudioClip keyUnlockSound;
+
     private bool isOpen = false;
     private float targetYRotation = 0f;
     private float currentYRotation = 0f;
@@ -41,7 +46,6 @@ public class JanitorDoor : MonoBehaviour, IInteractable
 
     public string GetInteractionPrompt()
     {
-        // Once opened, it stays open, so we don't need an interaction prompt anymore
         if (isOpen) return ""; 
         return "Press E to open. Requires Simple Key";
     }
@@ -52,10 +56,15 @@ public class JanitorDoor : MonoBehaviour, IInteractable
 
         if (playerInventory.HasSimpleKey())
         {
+            // --- NEW: Play the unlock sound at the door's location before the key vanishes ---
+            if (keyUnlockSound != null)
+            {
+                AudioSource.PlayClipAtPoint(keyUnlockSound, transform.position);
+            }
+
             playerInventory.ConsumeSimpleKey();
             Debug.Log("[JanitorDoor] Key accepted. Opening janitor room permanently.");
             
-            // UI Hook: Display unlock success text on screen
             if (GameUIManager.Instance != null)
             {
                 GameUIManager.Instance.DisplayNotification("Janitor room unlocked permanently!");
@@ -68,7 +77,6 @@ public class JanitorDoor : MonoBehaviour, IInteractable
         {
             Debug.Log("[JanitorDoor] Access Denied! You do not have a Simple Key.");
             
-            // UI Hook: Display lock restriction feedback alert on screen
             if (GameUIManager.Instance != null)
             {
                 GameUIManager.Instance.DisplayNotification("Locked! Requires a Simple Key.");

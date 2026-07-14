@@ -2,6 +2,11 @@ using UnityEngine;
 
 public class KeyCabinet : MonoBehaviour, IInteractable
 {
+    // --- NEW: Audio Field ---
+    [Header("Audio Clips")]
+    [Tooltip("Sound played when searching through this cabinet")]
+    [SerializeField] private AudioClip searchSound;
+
     private bool hasBeenOpened = false;
 
     public string GetInteractionPrompt()
@@ -14,7 +19,6 @@ public class KeyCabinet : MonoBehaviour, IInteractable
     {
         if (hasBeenOpened)
         {
-            // UI Hook: Remind the player that they've already looted this cabinet
             if (GameUIManager.Instance != null)
             {
                 GameUIManager.Instance.DisplayNotification("The cabinet is empty.");
@@ -22,9 +26,14 @@ public class KeyCabinet : MonoBehaviour, IInteractable
             return;
         }
 
+        // --- NEW: Play searching sound instantly ---
+        if (searchSound != null)
+        {
+            AudioSource.PlayClipAtPoint(searchSound, transform.position);
+        }
+
         hasBeenOpened = true;
         
-        // This automatically handles the UI icon update and "Collected a Simple Key!" notification
         playerInventory.AddSimpleKey(); 
         Debug.Log("[Cabinet] Dispensed 1 Simple Key to the player.");
     }

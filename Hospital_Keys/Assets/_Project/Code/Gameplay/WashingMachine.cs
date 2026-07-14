@@ -6,6 +6,11 @@ public class WashingMachine : MonoBehaviour, IInteractable
     [Tooltip("Check this ONLY on the specific machine you want to hide the key in.")]
     [SerializeField] private bool hasKey = false; 
 
+    // --- NEW: Audio Field ---
+    [Header("Audio Clips")]
+    [Tooltip("Metallic/hollow clatter sound when opening or searching the washing machine")]
+    [SerializeField] private AudioClip searchSound;
+
     private bool hasBeenOpened = false;
 
     public string GetInteractionPrompt()
@@ -21,6 +26,12 @@ public class WashingMachine : MonoBehaviour, IInteractable
     {
         if (hasBeenOpened) return;
 
+        // --- NEW: Play washing machine search sound instantly ---
+        if (searchSound != null)
+        {
+            AudioSource.PlayClipAtPoint(searchSound, transform.position);
+        }
+
         hasBeenOpened = true;
 
         if (hasKey)
@@ -31,7 +42,6 @@ public class WashingMachine : MonoBehaviour, IInteractable
         {
             Debug.Log("[WashingMachine] Looked inside... Empty.");
             
-            // UI Hook: Display empty alert text on the screen for the player
             if (GameUIManager.Instance != null)
             {
                 GameUIManager.Instance.DisplayNotification("Washing machine is empty...");

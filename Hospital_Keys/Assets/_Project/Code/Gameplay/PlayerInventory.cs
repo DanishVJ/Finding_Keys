@@ -9,6 +9,13 @@ public class PlayerInventory : MonoBehaviour
     [Header("Special Items")]
     [SerializeField] private int simpleKeyCount = 0; // Tracks how many simple keys you have
 
+    // --- NEW: Sound Effect Fields ---
+    [Header("Audio Clips")]
+    [Tooltip("Sound played when the player discovers and upgrades a security keycard")]
+    [SerializeField] private AudioClip keycardFoundSound;
+    [Tooltip("Sound played when the player finds a consumable simple key")]
+    [SerializeField] private AudioClip simpleKeyFoundSound;
+
     public void UpgradeKeycard(KeycardLevel newLevel)
     {
         if (newLevel > CurrentHighestCard)
@@ -16,6 +23,9 @@ public class PlayerInventory : MonoBehaviour
             CurrentHighestCard = newLevel;
             Debug.Log($"Inventory Updated! Highest card is now: {CurrentHighestCard}");
             
+            // --- NEW: Play the keycard discovery sound at the player's position ---
+            PlayDiscoverySound(keycardFoundSound);
+
             // UI Hooks: Send text notification and refresh icon color
             if (GameUIManager.Instance != null)
             {
@@ -31,11 +41,23 @@ public class PlayerInventory : MonoBehaviour
         simpleKeyCount++;
         Debug.Log($"Collected a Simple Key! Total keys: {simpleKeyCount}");
 
+        // --- NEW: Play the simple key discovery sound at the player's position ---
+        PlayDiscoverySound(simpleKeyFoundSound);
+
         // UI Hooks: Light up icon and display top-left text log
         if (GameUIManager.Instance != null)
         {
             GameUIManager.Instance.UpdateSimpleKeyUI(true);
             GameUIManager.Instance.DisplayNotification("Collected a Simple Key!");
+        }
+    }
+
+    // --- NEW: Audio helper function ---
+    private void PlayDiscoverySound(AudioClip clip)
+    {
+        if (clip != null)
+        {
+            AudioSource.PlayClipAtPoint(clip, transform.position);
         }
     }
 

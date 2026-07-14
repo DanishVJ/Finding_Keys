@@ -6,6 +6,11 @@ public class SearchableItem : MonoBehaviour, IInteractable
     [SerializeField] private string containerName = "File Cabinet";
     [SerializeField] private KeycardLevel hiddenCard = KeycardLevel.None;
 
+    // --- NEW: Audio Field ---
+    [Header("Audio Clips")]
+    [Tooltip("Sound played when searching through this item")]
+    [SerializeField] private AudioClip searchSound;
+
     private bool hasBeenSearched = false;
 
     public string GetInteractionPrompt()
@@ -20,7 +25,6 @@ public class SearchableItem : MonoBehaviour, IInteractable
         {
             Debug.Log($"{containerName} has already been searched.");
             
-            // UI Hook: Inform the player it's already cleared
             if (GameUIManager.Instance != null)
             {
                 GameUIManager.Instance.DisplayNotification($"{containerName} is already empty.");
@@ -28,12 +32,17 @@ public class SearchableItem : MonoBehaviour, IInteractable
             return;
         }
 
+        // --- NEW: Play searching sound instantly ---
+        if (searchSound != null)
+        {
+            AudioSource.PlayClipAtPoint(searchSound, transform.position);
+        }
+
         hasBeenSearched = true;
         Debug.Log($"Searching {containerName}...");
 
         if (hiddenCard != KeycardLevel.None)
         {
-            // Safely upgrade the player's keycard rank in their inventory (fires UI alert automatically)
             playerInventory.UpgradeKeycard(hiddenCard);
             Debug.Log($"Success! Found a {hiddenCard} access card.");
         }
@@ -41,7 +50,6 @@ public class SearchableItem : MonoBehaviour, IInteractable
         {
             Debug.Log("Nothing found inside.");
 
-            // UI Hook: Display empty container feedback text log
             if (GameUIManager.Instance != null)
             {
                 GameUIManager.Instance.DisplayNotification($"Found nothing inside the {containerName}.");
