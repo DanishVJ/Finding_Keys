@@ -11,6 +11,11 @@ public class CardboardBox : MonoBehaviour, IInteractable
     [Tooltip("How fast the box slides.")]
     [SerializeField] private float slideSpeed = 5f;
 
+    // --- NEW: Sound Effect Field ---
+    [Header("Audio Clips")]
+    [Tooltip("Sound played when the player interacts and the box begins to slide")]
+    [SerializeField] private AudioClip cardboardSlideSound;
+
     private Vector3 startPosition;
     private bool isAtTarget = false;
     private bool isMoving = false; // Prevents spamming E while it's mid-slide
@@ -42,6 +47,12 @@ public class CardboardBox : MonoBehaviour, IInteractable
     {
         // Safety check: if the box is already mid-slide, ignore extra inputs
         if (isMoving || targetPoint == null) return;
+
+        // --- NEW: Play the slide sound at the box's current location ---
+        if (cardboardSlideSound != null)
+        {
+            AudioSource.PlayClipAtPoint(cardboardSlideSound, transform.position);
+        }
         
         // Determine the next destination based on our current state toggle
         Vector3 destination = isAtTarget ? startPosition : targetPoint.position;

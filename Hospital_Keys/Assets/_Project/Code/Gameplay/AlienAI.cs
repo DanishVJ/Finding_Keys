@@ -24,6 +24,11 @@ public class AlienAI : MonoBehaviour
     [SerializeField] private float playerDetectRadius = 5f;
     [SerializeField] private float searchRadius = 40f;
 
+    // --- NEW: Sound Effects Fields ---
+    [Header("Audio Clips")]
+    [Tooltip("Sound played the split second the alien spots the player and flees")]
+    [SerializeField] private AudioClip detectionSound;
+
     private Transform currentTarget;
     private Collider[] playerBuffer = new Collider[1];
     
@@ -38,6 +43,8 @@ public class AlienAI : MonoBehaviour
                 int playerFound = Physics.OverlapSphereNonAlloc(transform.position, playerDetectRadius, playerBuffer, playerLayer);
                 if (playerFound > 0)
                 {
+                    // --- NEW: Play the clip right at the split second of detection ---
+                    PlaySound(detectionSound);
                     FindAndFleeToNearestHatch();
                 }
                 break;
@@ -54,9 +61,20 @@ public class AlienAI : MonoBehaviour
                 int playerApproaching = Physics.OverlapSphereNonAlloc(transform.position, playerDetectRadius, playerBuffer, playerLayer);
                 if (playerApproaching > 0)
                 {
+                    // --- NEW: Play detection sound here too if it spot you while cornered ---
+                    PlaySound(detectionSound);
                     FindAndFleeToNearestHatch();
                 }
                 break;
+        }
+    }
+
+    // --- NEW: Global sound helper function ---
+    private void PlaySound(AudioClip clip)
+    {
+        if (clip != null)
+        {
+            AudioSource.PlayClipAtPoint(clip, transform.position);
         }
     }
 
@@ -173,7 +191,6 @@ public class AlienAI : MonoBehaviour
 
     private void MoveTowardsTarget()
     {
-        // Custom notification handling based on whether it broke free or is just walking normal
         if (GameUIManager.Instance != null)
         {
             if (wasOnceCornered)

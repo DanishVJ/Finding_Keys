@@ -15,6 +15,11 @@ public class Door : MonoBehaviour, IInteractable
     [SerializeField] private float openAngle = 90f;
     [SerializeField] private float holdOpenTime = 5f; // Hard-coded to 5 seconds
 
+    // --- NEW: Sound Effect Field ---
+    [Header("Audio Clips")]
+    [Tooltip("Sound played when the door starts opening and when it automatically closes")]
+    [SerializeField] private AudioClip doorMovementSound;
+
     private bool isOpen = false;
     private float targetYRotation = 0f;
     private float currentYRotation = 0f;
@@ -93,6 +98,9 @@ public class Door : MonoBehaviour, IInteractable
     {
         isOpen = true;
 
+        // --- NEW: Play the door sound when it begins to open ---
+        PlayDoorSound();
+
         // Use the grandparent hinge's orientation matrix to calculate side-of-approach
         Vector3 dirToPlayer = (interactorPosition - doorHingeGrandparent.position).normalized;
         float dot = Vector3.Dot(doorHingeGrandparent.forward, dirToPlayer);
@@ -116,6 +124,10 @@ public class Door : MonoBehaviour, IInteractable
     private IEnumerator AutoCloseCountdown()
     {
         yield return new WaitForSeconds(holdOpenTime);
+        
+        // --- NEW: Play the door sound again right as the automatic close begins ---
+        PlayDoorSound();
+
         targetYRotation = 0f;
         isOpen = false;
         
@@ -123,6 +135,15 @@ public class Door : MonoBehaviour, IInteractable
         if (GameUIManager.Instance != null)
         {
             GameUIManager.Instance.DisplayNotification("Door automatically closed.");
+        }
+    }
+
+    // --- NEW: Private audio helper ---
+    private void PlayDoorSound()
+    {
+        if (doorMovementSound != null)
+        {
+            AudioSource.PlayClipAtPoint(doorMovementSound, transform.position);
         }
     }
 }
