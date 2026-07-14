@@ -12415,6 +12415,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1230426111939843818, guid: 7d7d4098361a68e4cbf6fe0cb51c4f2c, type: 3}
+      propertyPath: detectionSound
+      value: 
+      objectReference: {fileID: 8300000, guid: c218d91c25f6edd45b61a9a27f0ef017, type: 3}
+    - target: {fileID: 1230426111939843818, guid: 7d7d4098361a68e4cbf6fe0cb51c4f2c, type: 3}
       propertyPath: wallLayer.m_Bits
       value: 1
       objectReference: {fileID: 0}
@@ -17190,6 +17194,7 @@ MonoBehaviour:
   isFlipped: 0
   swingSpeed: 6
   openAngle: 90
+  keyUnlockSound: {fileID: 8300000, guid: b3ef11fa109c1d74faff364780dc72e0, type: 3}
 --- !u!43 &1081286070
 Mesh:
   m_ObjectHideFlags: 0
@@ -42730,7 +42735,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2003111235124739692, guid: 3fd0d988a0e97f0409a348653d4ae47c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 16.43
+      value: 16.15
       objectReference: {fileID: 0}
     - target: {fileID: 2003111235124739692, guid: 3fd0d988a0e97f0409a348653d4ae47c, type: 3}
       propertyPath: m_LocalPosition.y
@@ -49163,6 +49168,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2647802410128075923, guid: cab26ba7c90f14042b47020296936e49, type: 3}
+      propertyPath: keycardFoundSound
+      value: 
+      objectReference: {fileID: 8300000, guid: cf07a97bb213f2e4199f9ff842a20643, type: 3}
+    - target: {fileID: 2647802410128075923, guid: cab26ba7c90f14042b47020296936e49, type: 3}
+      propertyPath: simpleKeyFoundSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 698d1b9696c2f9c4bb8283e9834ccc42, type: 3}
     - target: {fileID: 3010115654286899706, guid: cab26ba7c90f14042b47020296936e49, type: 3}
       propertyPath: m_Name
       value: Player
@@ -50081,13 +50094,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4088309088464133083, guid: c7e7d6afdaf546d418d54b98b5881f2c, type: 3}
+      propertyPath: keyUnlockSound
+      value: 
+      objectReference: {fileID: 8300000, guid: b3ef11fa109c1d74faff364780dc72e0, type: 3}
     - target: {fileID: 4940661943901025669, guid: c7e7d6afdaf546d418d54b98b5881f2c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.46
       objectReference: {fileID: 0}
     - target: {fileID: 4940661943901025669, guid: c7e7d6afdaf546d418d54b98b5881f2c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.24
+      value: 0.48
       objectReference: {fileID: 0}
     - target: {fileID: 4940661943901025669, guid: c7e7d6afdaf546d418d54b98b5881f2c, type: 3}
       propertyPath: m_LocalPosition.z

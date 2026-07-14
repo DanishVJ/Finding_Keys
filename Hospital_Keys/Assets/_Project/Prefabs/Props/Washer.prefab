@@ -271,3 +271,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WashingMachine
   hasKey: 0
+  searchSound: {fileID: 8300000, guid: cdd1377905b7e5d4880b605ecb7540a6, type: 3}

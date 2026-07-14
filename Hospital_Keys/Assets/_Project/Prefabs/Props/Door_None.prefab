@@ -76,10 +76,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Door
   requiredLevel: 0
-  childPivot: {fileID: 5747107528631313062}
+  isFlipped: 0
   swingSpeed: 6
   openAngle: 90
   holdOpenTime: 10
+  doorMovementSound: {fileID: 8300000, guid: 79a5255680799c8479006d215fc8f899, type: 3}
 --- !u!1 &5251542633101286782
 GameObject:
   m_ObjectHideFlags: 0

@@ -255,3 +255,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SearchableItem
   containerName: File Cabinet
   hiddenCard: 0
+  searchSound: {fileID: 8300000, guid: bfa42bc55a491ae469e0533d9cd386f0, type: 3}
