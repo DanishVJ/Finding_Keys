@@ -1126,6 +1126,11 @@ MonoBehaviour:
   interactionPromptText: {fileID: 1226977950}
   keycardIcon: {fileID: 1151999682}
   simpleKeyIcon: {fileID: 17001117}
+  blueCardSprite: {fileID: 21300000, guid: 80fa1a682feb07d44a3ddd7432f30e5a, type: 3}
+  redCardSprite: {fileID: 21300000, guid: 8d4457d2b9d2d934897a2e13ee87e6b2, type: 3}
+  purpleCardSprite: {fileID: 21300000, guid: f707649f9e396ff4db23763650d5acb0, type: 3}
+  silverCardSprite: {fileID: 21300000, guid: 5623c07eb7055ef4080e7ec80b212006, type: 3}
+  goldCardSprite: {fileID: 21300000, guid: 732f7464c1974294b9a42e0c74242868, type: 3}
   notificationText: {fileID: 288249834}
   notificationDuration: 3
 --- !u!114 &55425842
